@@ -1,5 +1,6 @@
 package co.com.talataa.consumer;
 
+import co.com.talataa.model.movie.Movie;
 import co.com.talataa.model.responsepopularmovie.ResponsePopularMovie;
 import co.com.talataa.model.responsepopularmovie.gateways.ResponsePopularMovieService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,24 +35,18 @@ public class RestConsumer implements ResponsePopularMovieService// implements Ga
         return mapper.readValue(client.newCall(request).execute().body().string(), ResponsePopularMovie.class);
     }
 
-    public ObjectResponse testPost() throws IOException {
-        String json = mapper.writeValueAsString(ObjectRequest.builder()
-            .val1("exampleval1")
-            .val2("exampleval1")
-            .build()
-        );
-
-        RequestBody requestBody = RequestBody
-            .create(json, MediaType.parse("application/json; charset=utf-8"));
+    public Movie getMovie(Long id) throws IOException {
 
         Request request = new Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .addHeader("Content-Type","application/json")
-            .build();
+                .url(url+"/movie/"+id+"?api_key="+apiKey)
+                .get()
+                .addHeader("Content-Type","application/json")
+                .build();
 
-        return mapper.readValue(client.newCall(request).execute().body().string(), ObjectResponse.class);
-
+        return mapper.readValue(client.newCall(request).execute().body().string(), Movie.class);
     }
+
+
+
 
 }

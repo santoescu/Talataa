@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Movie {
-    private boolean adult;
+    private Boolean adult;
     @JsonProperty(value = "backdrop_path")
     private String backdropPath;
     @JsonProperty(value = "belongs_to_collection")
@@ -52,9 +52,9 @@ public class Movie {
     private String status;
     private String tagline;
     private String title;
-    private boolean video;
+    private Boolean video;
     @JsonProperty(value = "vote_average")
-    private float voteAverage;
+    private Float voteAverage;
     @JsonProperty(value = "vote_count")
     private Long voteCount;
     @JsonProperty(value = "genre_ids")
