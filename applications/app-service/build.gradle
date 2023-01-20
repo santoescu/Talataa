@@ -2,7 +2,6 @@ apply plugin: 'org.springframework.boot'
 
 dependencies {
 	implementation 'org.reactivecommons.utils:object-mapper:0.1.0'
-	implementation project( ':jpa-repository')
 	implementation project( ':api-rest')
 	implementation project( ':rest-consumer')
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
@@ -17,12 +16,6 @@ task explodedJar(type: Copy) {
     into "${buildDir}/exploded"
 }
 
-jar {
-    // To disable the *-plain.jar
-    enabled = false
-}
-
-bootJar {
-    // Sets output jar name
-    archiveFileName = "${project.getParent().getName()}.${archiveExtension.get()}"
+configurations {
+    compile.exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
 }
