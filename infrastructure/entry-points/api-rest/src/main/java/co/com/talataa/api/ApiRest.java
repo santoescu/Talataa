@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Optional;
 
 
 @RestController
@@ -25,30 +26,31 @@ public class ApiRest {
         return "Hello World";
     }
     @GetMapping(path = "/movie/popular")
-    public ResponsePopularMovie getPopularMovies() {
+    public ResponsePopularMovie getPopularMovies(@RequestParam(required = false) Long page) {
         try {
-            return movieManagementUseCase.getPopularMovies();
+            return movieManagementUseCase.getPopularMovies(page);
         }catch (IOException e){
             return null;
         }
 
     }
     @GetMapping(path = "/movie/{id}")
-    public Movie getMovie(@PathVariable Long id) {
+    public ResponseEntity<?> getMovie(@PathVariable Long id) {
         try {
-            return movieManagementUseCase.getMovie(id);
+            return ResponseEntity.status(HttpStatus.OK).body(movieManagementUseCase.getMovie(id));
         }catch (IOException e){
             return null;
+        }catch (BusinessException e){
+            return ResponseEntity.status(e.getStatusCode()).body(e.getDescription());
         }
 
     }
     @DeleteMapping(path = "/movie/delete/{id}")
     public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
         try {
-            ResponsePopularMovie responsePopularMovie = movieManagementUseCase.deleteMovie(id);
+            String response = movieManagementUseCase.deleteMovie(id);
 
-                return ResponseEntity.status(HttpStatus.OK).body(responsePopularMovie);
-
+                return ResponseEntity.status(HttpStatus.OK).body(response);
 
         }catch (BusinessException e){
             return ResponseEntity.status(e.getStatusCode()).body(e.getDescription());
@@ -60,9 +62,8 @@ public class ApiRest {
     @PostMapping(path = "/movie/new")
     public ResponseEntity<?> newMovie(@RequestBody Movie movie) {
         try {
-            ResponsePopularMovie responsePopularMovie = movieManagementUseCase.newMovie(movie);
-
-            return ResponseEntity.status(HttpStatus.OK).body(responsePopularMovie);
+            Movie response = movieManagementUseCase.newMovie(movie);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }catch (BusinessException e){
             return ResponseEntity.status(e.getStatusCode()).body(e.getDescription());
         }catch (IOException e){
@@ -73,14 +74,13 @@ public class ApiRest {
     @PutMapping(path = "/movie/update")
     public ResponseEntity<?> upDateMovie(@RequestBody Movie movie) {
         try {
-            ResponsePopularMovie responsePopularMovie = movieManagementUseCase.upDateMovie(movie);
+            Movie response= movieManagementUseCase.upDateMovie(movie);
 
-            return ResponseEntity.status(HttpStatus.OK).body(responsePopularMovie);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }catch (BusinessException e){
             return ResponseEntity.status(e.getStatusCode()).body(e.getDescription());
         }catch (IOException e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
     }
 }

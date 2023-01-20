@@ -1,5 +1,6 @@
 package co.com.talataa.consumer.config;
 
+import co.com.talataa.consumer.ListMovie;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -29,6 +30,11 @@ public class RestConsumerConfig {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
         return mapper;
+    }
+
+    @Bean
+    public ListMovie getListMovie(){
+        return new ListMovie();
     }
 
 }

@@ -36,7 +36,7 @@ public class Movie {
     @JsonProperty(value = "original_title")
     private String originalTitle;
     private String overview;
-    private float popularity;
+    private Float popularity;
     @JsonProperty(value = "poster_path")
     private String posterPath;
     @JsonProperty(value = "production_companies")
@@ -59,4 +59,5 @@ public class Movie {
     private Long voteCount;
     @JsonProperty(value = "genre_ids")
     private List<Integer> genreIds;
+    private boolean statusMovie;
 }

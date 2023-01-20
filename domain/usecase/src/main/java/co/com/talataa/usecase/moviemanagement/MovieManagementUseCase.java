@@ -14,50 +14,47 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MovieManagementUseCase {
     private final ResponsePopularMovieService responsePopularMovieService;
-    public ResponsePopularMovie getPopularMovies() throws IOException {
+    public ResponsePopularMovie getPopularMovies(Long page) throws IOException {
 
-        return responsePopularMovieService.getPopularMovies();
+        return responsePopularMovieService.getPopularMovies(page);
     }
 
-    public Movie getMovie(Long id) throws IOException {
-
-        return responsePopularMovieService.getMovie(id);
+    public Movie getMovie(Long id) throws IOException, BusinessException {
+        Movie movie = responsePopularMovieService.getMovie(id);
+        if(movie ==null){
+            throw new BusinessException(400,"Pelicula "+id+" No existe");
+        }
+        return movie;
     }
-    public ResponsePopularMovie deleteMovie(Long id) throws IOException, BusinessException {
-        ResponsePopularMovie responsePopularMovie = responsePopularMovieService.getPopularMovies();
-        List<Movie> movies = responsePopularMovie.getResults();
-        Optional<Movie> optionalMovie = movies.stream().filter(movie -> movie.getId().equals(id)).findFirst();
-        if (optionalMovie.isPresent()){
-            Movie movie = optionalMovie.get();
+    public String deleteMovie(Long id) throws IOException, BusinessException {
+        Movie movie = responsePopularMovieService.getMovie(id);
+        List<Movie> movies = responsePopularMovieService.getMovies();
+        if (movie!= null){
             movies.remove(movie);
-            responsePopularMovie.setResults(movies);
-            return responsePopularMovie;
+            movie.setStatusMovie(false);
+            movies.add(movie);
+            return "Se ha eliminado exitosamente";
         }
         throw new BusinessException(404,"Pelicula "+id+" no encontrada");
     }
-    public ResponsePopularMovie newMovie(Movie movie) throws IOException, BusinessException {
-        ResponsePopularMovie responsePopularMovie = responsePopularMovieService.getPopularMovies();
-        List<Movie> movies = responsePopularMovie.getResults();
-        Optional<Movie> optionalMovie = movies.stream().filter(m -> m.getId().equals(movie.getId())).findFirst();
-        if (optionalMovie.isPresent()){
+    public Movie newMovie(Movie movie) throws IOException, BusinessException {
+        Movie oldMovie = responsePopularMovieService.getMovie(movie.getId());
+        List<Movie> movies = responsePopularMovieService.getMovies();
+        if (oldMovie != null){
             throw new BusinessException(400,"Pelicula "+movie.getId()+" ya existe");
         }
+        movie.setStatusMovie(true);
         movies.add(movie);
-        responsePopularMovie.setResults(movies);
-        return responsePopularMovie;
+        return movie;
     }
-    public ResponsePopularMovie upDateMovie(Movie movie) throws IOException, BusinessException {
-        ResponsePopularMovie responsePopularMovie = responsePopularMovieService.getPopularMovies();
-        List<Movie> movies = responsePopularMovie.getResults();
-        Optional<Movie> optionalMovie = movies.stream().filter(m -> m.getId().equals(movie.getId())).findFirst();
-        if (optionalMovie.isPresent()){
-            Movie oldMovie = optionalMovie.get();
+    public Movie upDateMovie(Movie movie) throws IOException, BusinessException {
+        Movie oldMovie = responsePopularMovieService.getMovie(movie.getId());
+        List<Movie> movies = responsePopularMovieService.getMovies();
+        if (oldMovie != null){
             Movie newMovie = validateFields(oldMovie,movie);
             movies.remove(oldMovie);
             movies.add(newMovie);
-            responsePopularMovie.setResults(movies);
-            return responsePopularMovie;
-
+            return newMovie;
         }
         throw new BusinessException(404,"Pelicula "+movie.getId()+" no existe");
     }
@@ -131,6 +128,14 @@ public class MovieManagementUseCase {
         if (request.getVoteCount() != null){
             movie.setVoteCount(request.getVoteCount());
         }
+        if (request.getPopularity() != null){
+            movie.setPopularity(request.getPopularity());
+        }
+        if (request.getBudget() != null){
+            movie.setBudget(request.getBudget());
+        }
+        movie.setId(request.getId());
+        movie.setStatusMovie(true);
 
         return movie;
     }
